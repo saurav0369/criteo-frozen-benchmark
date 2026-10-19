@@ -9,7 +9,7 @@ permissions:
   contents: read
 concurrency:
   group: criteo-frozen-benchmark
-  cancel-in-progress: false
+  cancel-in-progress: true
 jobs:
   eight-baselines:
     runs-on: ubuntu-latest
