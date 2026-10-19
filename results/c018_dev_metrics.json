@@ -1,0 +1,65 @@
+{
+  "dev_predictions": 659718,
+  "development_end": 1869839.2999999998,
+  "event_labels_received": 815757,
+  "event_timestamps_are_not_publication_timestamps": true,
+  "first_t": 0,
+  "fully_matured_labels_received": 806870,
+  "holdout_outcomes_evaluated": 0,
+  "last_t": 2671199,
+  "metrics": {
+    "campaign_event": {
+      "brier": 0.030243755,
+      "logloss": 0.130461113
+    },
+    "campaign_mature": {
+      "brier": 0.02910945,
+      "logloss": 0.124109993
+    },
+    "fixed_prior": {
+      "brier": 0.031196319,
+      "logloss": 0.171678493
+    },
+    "global_event": {
+      "brier": 0.031183424,
+      "logloss": 0.146550213
+    },
+    "global_mature": {
+      "brier": 0.030496649,
+      "logloss": 0.139902115
+    },
+    "hashed_logit_event": {
+      "brier": 0.028473254,
+      "logloss": 0.118492401
+    },
+    "hashed_logit_mature": {
+      "brier": 0.028526077,
+      "logloss": 0.1184916
+    },
+    "rolling_event": {
+      "brier": 0.030711829,
+      "logloss": 0.142064749
+    }
+  },
+  "params": {
+    "campaign_weight": 50,
+    "hash_features": [
+      "campaign",
+      "cat1",
+      "cat2"
+    ],
+    "hash_size": 65536,
+    "logit_step_size": 0.05,
+    "prior": 0.005,
+    "prior_weight": 200
+  },
+  "prediction_digest": "b07ceeaffa7fdf9a633e8afda281580b68e7e47ba99c7d9f7f18a089f1adfc37",
+  "sample_every": 10,
+  "sampled_preholdout": 1171768,
+  "source_hash": "94ac7a465564349bc7ba008602211d5990a3c53cc133abc0aadef61ea2391a98",
+  "src": "criteo_attribution_dataset.tsv.gz",
+  "src_rows": 16468027,
+  "status": "SYNTHETIC_ONLY unless official source externally verified",
+  "warmup_boundary": 801359.7,
+  "warmup_samples": 512050
+}
