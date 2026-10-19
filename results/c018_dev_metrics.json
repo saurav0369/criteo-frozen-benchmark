@@ -42,7 +42,7 @@
     }
   },
   "params": {
-    "campaign_weight": 50,
+    "campaign_weight": 50.0,
     "hash_features": [
       "campaign",
       "cat1",
@@ -51,7 +51,7 @@
     "hash_size": 65536,
     "logit_step_size": 0.05,
     "prior": 0.005,
-    "prior_weight": 200
+    "prior_weight": 200.0
   },
   "prediction_digest": "b07ceeaffa7fdf9a633e8afda281580b68e7e47ba99c7d9f7f18a089f1adfc37",
   "sample_every": 10,
