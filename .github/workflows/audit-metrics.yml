@@ -1,0 +1,33 @@
+name: Verify archived real-data metrics
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/audit-metrics.yml'
+      - 'results/c018_dev_metrics.json'
+      - 'results/DECISION.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  artifact-integrity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check exact original results artifact SHA-256
+        run: |
+          echo "e11a24b204924f13ba59c5e74d2da4a4d6cdf9d9591b4903304464edac01c0f3  results/c018_dev_metrics.json" | sha256sum -c
+      - name: Check research scope and source digest
+        run: |
+          python - <<'PY'
+          import json
+          d=json.load(open('results/c018_dev_metrics.json'))
+          assert d['source_hash']=='94ac7a465564349bc7ba008602211d5990a3c53cc133abc0aadef61ea2391a98'
+          assert d['src_rows']==16468027
+          assert d['dev_predictions']==659718
+          assert d['holdout_outcomes_evaluated']==0
+          assert len(d['metrics'])==8
+          assert d['prediction_digest']=='b07ceeaffa7fdf9a633e8afda281580b68e7e47ba99c7d9f7f18a089f1adfc37'
+          print('PASS: archived metrics unaltered; eight methods and sealed holdout recorded')
+          PY
