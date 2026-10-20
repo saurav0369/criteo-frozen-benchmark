@@ -1,0 +1,47 @@
+name: C021 strong conventional baselines (G0 exploratory)
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/c021.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  c021-frozen-compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout locked research sources
+        uses: actions/checkout@v4
+      - name: Install Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Compile code and run synthetic no-leakage controls
+        run: |
+          python -m py_compile c018_runner.py c021_strong_context.py test_c021.py
+          python test_c021.py
+      - name: Obtain official Criteo input
+        run: |
+          curl -fL --retry 3 --connect-timeout 30 --max-time 900 -o criteo_attribution_dataset.tsv.gz https://huggingface.co/datasets/criteo/criteo-attribution-dataset/resolve/main/criteo_attribution_dataset.tsv.gz
+      - name: Verify unmodified official data source
+        run: |
+          test "$(stat -c %s criteo_attribution_dataset.tsv.gz)" = "653015824"
+          echo "94ac7a465564349bc7ba008602211d5990a3c53cc133abc0aadef61ea2391a98  criteo_attribution_dataset.tsv.gz" | sha256sum --check
+          echo "9cdd97e532428ec85c43b409d11eb7db689ff08147978a071edd7a30033b64ba  c018_runner.py" | sha256sum --check
+      - name: Run locked development-only strong-context comparison
+        run: |
+          python -u c021_strong_context.py --input criteo_attribution_dataset.tsv.gz --out c021_development_metrics.json --sample-every 10 --official
+      - name: Wipe raw data
+        if: always()
+        run: |
+          rm -f criteo_attribution_dataset.tsv.gz
+      - name: Upload metrics and block differences only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: c021-strong-context-development-metrics
+          path: c021_development_metrics.json
+          if-no-files-found: warn
+          retention-days: 7
