@@ -1,0 +1,44 @@
+name: Permanently archive verified Cycle 021 metrics
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/archive-c021.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: read
+jobs:
+  preserve:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Recover exactly one trusted metric artifact (not the raw dataset)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p c021_artifact
+          gh run download 39433340247 -n c021-strong-context-development-metrics -D c021_artifact
+          test -f c021_artifact/c021_development_metrics.json
+          echo "71b8341531fced23a167b5d3a4712e07b61b19252cbaaeaa5bdf48b248d4e17c  c021_artifact/c021_development_metrics.json" | sha256sum -c
+      - name: Verify outcome scope before preservation
+        run: |
+          python - <<'PY'
+          import json
+          d=json.load(open('c021_artifact/c021_development_metrics.json'))
+          assert d['source_sha256']=='94ac7a465564349bc7ba008602211d5990a3c53cc133abc0aadef61ea2391a98'
+          assert d['frozen_parity_pass'] is True
+          assert d['baseline_prediction_digest']=='b07ceeaffa7fdf9a633e8afda281580b68e7e47ba99c7d9f7f18a089f1adfc37'
+          assert d['dev_examples']==659718 and d['holdout_outcomes_evaluated']==0
+          assert len(d['chronological_blocks'])==7 and len(d['metrics'])==12
+          print('PASS original output parity and sealed holdout')
+          PY
+      - name: Commit unmodified verified JSON
+        run: |
+          mkdir -p results
+          cp c021_artifact/c021_development_metrics.json results/c021_development_metrics.json
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add results/c021_development_metrics.json
+          git diff --cached --quiet || (git commit -m "Archive exact C021 experiment metrics and all seven time blocks" && git push)
